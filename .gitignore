@@ -1,0 +1,5 @@
+*.d
+*.o
+server
+client
+.idea/editor.xml
