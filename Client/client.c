@@ -25,7 +25,7 @@ void connect_to_server() {
     addr.sin_port = htons(PORT);
 
     // Connects the address
-    if(inet_pton(AF_INET, "127.0.0.1", &addr.sin_addr) <= 0) {
+    if(inet_pton(AF_INET, IP, &addr.sin_addr) <= 0) {
         perror("Invalid Address");
         exit(EXIT_FAILURE);
     }
@@ -36,29 +36,40 @@ void connect_to_server() {
         exit(EXIT_FAILURE);
     } 
 
+    int pid = fork();
     while(1) {
-        printf("Enter Message: ");
-        // Gets the message from user
-        if(fgets(buffer, BUFFER_SIZE, stdin) == NULL) {
-            perror("fgets() Failed");
-            exit(EXIT_FAILURE);
+        if(pid == 0) {
+            printf("Enter Message: ");
+            // Gets the message from user
+            if(fgets(buffer, BUFFER_SIZE, stdin) == NULL) {
+                perror("fgets() Failed");
+                exit(EXIT_FAILURE);
+            }
+
+            if(send(fd, buffer, BUFFER_SIZE, 0) < 0) {
+                perror("Send Failed");
+                exit(EXIT_FAILURE);
+            }
+
+            printf("Debug: %s", buffer);
+
+            if(strcmp(buffer, "/quit\n") == 0) {
+                printf("quiting...");
+                exit(0);
+            }
+
+            // Recieves Data From Server
+            char buf[BUFFER_SIZE];
+            recv(fd, buf, BUFFER_SIZE, 0);
+            printf("From server: %s", buf);
+
+            memset(buffer, 0, BUFFER_SIZE);
+        } else if(pid > 0) {
+            // Recieves Data From Server
+            char buf[BUFFER_SIZE];
+            recv(fd, buf, BUFFER_SIZE, 0);
+            printf("From server: %s", buf);
         }
-
-        if(send(fd, buffer, BUFFER_SIZE, 0) < 0) {
-            perror("Send Failed");
-            exit(EXIT_FAILURE);
-        }
-
-        if(strcmp(buffer, "/quit\n") == 0) {
-            exit(1);
-        }
-
-        // Recieves Data From Server
-        char buf[BUFFER_SIZE];
-        recv(fd, buf, BUFFER_SIZE, 0);
-        printf("From server: %s", buf);
-
-        memset(buffer, 0, BUFFER_SIZE);
     }
 
     close(fd);

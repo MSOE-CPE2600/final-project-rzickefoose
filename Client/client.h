@@ -9,6 +9,9 @@
 #define PORT 8080
 #define BUFFER_SIZE 1024
 #define BACKLOG 2
+#define IP "127.0.0.1"
+
+//"192.168.1.137"
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -9,7 +9,8 @@
 #define PORT 8080
 #define BUFFER_SIZE 1024
 #define BACKLOG 2
-#define USER_COUNT 5
+#define USER_COUNT 1
+#define IP "127.0.0.1"
 
 #include <pthread.h>
 #include <string.h>

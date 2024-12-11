@@ -26,6 +26,7 @@ void receive_data(void* thread_info) {
     }
 
     int pid1;
+    int pid2;
     while(1) {
         // Accepts New Connection
         if((p->new_socket = accept(p->fd, (struct sockaddr *)&p->address, (socklen_t *)&p->addrlen)) < 0) {
@@ -45,22 +46,50 @@ void receive_data(void* thread_info) {
             while((value = read(p->new_socket, buffer, BUFFER_SIZE)) > 0){
                 if(strcmp(buffer, "/quit\n") == 0) { // Checks if user quit
                     printf("User quitting...\n");
-                    // TEST NEW QUIT FUNCTIONALITY NEXT TIME!!!!!!!!!!
                     p->quit = 1;
                     exit(0);
                 }
                 printf("Client: %s", buffer);
-                send(p->new_socket, buffer, BUFFER_SIZE, 0);
+                //send(p->new_socket, buffer, BUFFER_SIZE, 0);
                 memset(buffer, 0, sizeof(buffer));
             }
             close(p->new_socket);
             exit(0);
-        } else {
-            close(p->new_socket);
-            // Listening While Other Process Handles Data
-            if(listen(p->fd, BACKLOG) < 0) {
-                perror("Listen Failed");
-                exit(EXIT_FAILURE);
+        } else if(pid1 > 0) {
+            pid2 = fork();
+            if(pid2 == 0) {
+                printf("In Child 2");
+
+                while(1) {
+                    char buffer[BUFFER_SIZE];
+
+                    if(fgets(buffer, BUFFER_SIZE, stdin) == NULL) {
+                        perror("fgets() Failed");
+                        exit(EXIT_FAILURE);
+                    }
+
+                    printf("Debug: %s", buffer);
+
+                    if(send(p->new_socket, buffer, BUFFER_SIZE, 0) < 0) {
+                        perror("Send Failed");
+                        exit(EXIT_FAILURE);
+                    }
+
+                    if(strcmp(buffer, "/quit\n") == 0) {
+                        close(p->new_socket);
+                        close(p->fd);
+                        exit(1);
+                    } else {
+                        continue;
+                    }
+                }
+            } else if(pid2 > 0) {
+                // Listening While Other Process Handles Data
+                if(listen(p->fd, BACKLOG) < 0) {
+                    perror("Listen Failed");
+                    exit(EXIT_FAILURE);
+                }
+                close(p->new_socket);
             }
         }
     }
@@ -108,7 +137,6 @@ void establish_connection(int new_socket[USER_COUNT]) {
     parameters.quit = 0;
     memcpy(parameters.new_sock_arr, new_socket, USER_COUNT);
 
-
     while(1) {
         // Creates Threads
         pthread_t thread_id[USER_COUNT];
@@ -125,9 +153,6 @@ void establish_connection(int new_socket[USER_COUNT]) {
             close(fd);
         }
     }
-
-    // Close the Socket
-    close(fd);
 }
 
 int main(void) {
