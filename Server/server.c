@@ -28,7 +28,7 @@ void receive_data(void* thread_info) {
     int pid1;
     while(1) {
         // Accepts New Connection
-        if((p->new_socket = accept(p->fd, (struct sockaddr *)&p->address, &p->addrlen)) < 0) {
+        if((p->new_socket = accept(p->fd, (struct sockaddr *)&p->address, (socklen_t *)&p->addrlen)) < 0) {
             perror("Accept Failed");
             exit(EXIT_FAILURE);
         }
@@ -72,7 +72,6 @@ void establish_connection(int new_socket[USER_COUNT]) {
     struct sockaddr_in address;
     int opt = 1;
     int addrlen = sizeof(address);
-    char buffer[BUFFER_SIZE] = {0};
 
     // Creates Socket File Descriptor
     if((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
