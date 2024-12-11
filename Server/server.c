@@ -99,6 +99,8 @@ void establish_connection(int new_socket[USER_COUNT]) {
         exit(EXIT_FAILURE);
     }
 
+    printf("Listening on Port: %d\n", PORT);
+
     params parameters;
     parameters.fd = fd;
     parameters.addrlen = addrlen;

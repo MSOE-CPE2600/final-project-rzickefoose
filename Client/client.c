@@ -25,7 +25,7 @@ void connect_to_server() {
     addr.sin_port = htons(PORT);
 
     // Connects the address
-    if(inet_pton(AF_INET, "192.168.1.137", &addr.sin_addr) <= 0) {
+    if(inet_pton(AF_INET, "127.0.0.1", &addr.sin_addr) <= 0) {
         perror("Invalid Address");
         exit(EXIT_FAILURE);
     }
@@ -37,6 +37,7 @@ void connect_to_server() {
     } 
 
     while(1) {
+        printf("Enter Message: ");
         // Gets the message from user
         if(fgets(buffer, BUFFER_SIZE, stdin) == NULL) {
             perror("fgets() Failed");
