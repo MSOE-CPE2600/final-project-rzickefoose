@@ -1,7 +1,7 @@
 /***************************************************************** 
 * Filename: server.c
 * Description: Server side of the chatroom program
-* Author: Rose Zickefoose
+* Author: Rose Zickefoose and Keegan Kastman
 * Date: 12/9/24
 * Note (Compile Instructions): make
 *****************************************************************/
@@ -13,6 +13,7 @@ typedef struct PARAMETERS {
     int fd, new_socket, addrlen;
     struct sockaddr_in address;
     short quit;
+    int new_sock_arr[USER_COUNT];
 } params;
 
 void receive_data(void* thread_info) {
@@ -49,13 +50,14 @@ void receive_data(void* thread_info) {
                     exit(0);
                 }
                 printf("Client: %s", buffer);
+                send(p->new_socket, buffer, BUFFER_SIZE, 0);
                 memset(buffer, 0, sizeof(buffer));
             }
             close(p->new_socket);
             exit(0);
         } else {
             close(p->new_socket);
-            // Listening
+            // Listening While Other Process Handles Data
             if(listen(p->fd, BACKLOG) < 0) {
                 perror("Listen Failed");
                 exit(EXIT_FAILURE);
@@ -103,6 +105,7 @@ void establish_connection(int new_socket[USER_COUNT]) {
     parameters.addrlen = addrlen;
     parameters.address = address;
     parameters.quit = 0;
+    memcpy(parameters.new_sock_arr, new_socket, USER_COUNT);
 
 
     while(1) {

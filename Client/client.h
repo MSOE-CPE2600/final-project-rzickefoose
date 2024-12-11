@@ -1,3 +1,11 @@
+/***************************************************************** 
+* Filename: client.h
+* Description: Header file for client.c
+* Author: Rose Zickefoose and Keegan Kastman
+* Date: 12/9/24
+* Note (Compile Instructions): make
+*****************************************************************/
+
 #define PORT 8080
 #define BUFFER_SIZE 1024
 #define BACKLOG 2

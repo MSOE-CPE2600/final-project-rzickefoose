@@ -1,7 +1,7 @@
 /***************************************************************** 
 * Filename: client.c
 * Description: Client side of the chatroom program
-* Author: Rose Zickefoose
+* Author: Rose Zickefoose and Keegan Kastman
 * Date: 12/9/24
 * Note (Compile Instructions): make
 *****************************************************************/
@@ -51,6 +51,11 @@ void connect_to_server() {
         if(strcmp(buffer, "/quit\n") == 0) {
             exit(1);
         }
+
+        // Recieves Data From Server
+        char buf[BUFFER_SIZE];
+        recv(fd, buf, BUFFER_SIZE, 0);
+        printf("From server: %s", buf);
 
         memset(buffer, 0, BUFFER_SIZE);
     }
